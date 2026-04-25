@@ -1,0 +1,54 @@
+{
+  "machines": [
+    {
+      "id": "M001",
+      "name": "CNC Lathe",
+      "status": "running",
+      "health": 92,
+      "temperature": 68,
+      "last_maintenance": "2025-02-10",
+      "next_maintenance": "2025-04-10",
+      "operator": "Ravi Kumar"
+    },
+    {
+      "id": "M002",
+      "name": "Hydraulic Press",
+      "status": "idle",
+      "health": 78,
+      "temperature": 45,
+      "last_maintenance": "2025-01-15",
+      "next_maintenance": "2025-03-20",
+      "operator": "Anil Sharma"
+    },
+    {
+      "id": "M003",
+      "name": "Welding Robot",
+      "status": "warning",
+      "health": 55,
+      "temperature": 87,
+      "last_maintenance": "2024-12-01",
+      "next_maintenance": "2025-03-18",
+      "operator": "Meena Pillai"
+    },
+    {
+      "id": "M004",
+      "name": "Conveyor Belt A",
+      "status": "running",
+      "health": 88,
+      "temperature": 40,
+      "last_maintenance": "2025-02-20",
+      "next_maintenance": "2025-05-01",
+      "operator": "Suresh Nair"
+    },
+    {
+      "id": "M005",
+      "name": "Industrial Drill",
+      "status": "offline",
+      "health": 20,
+      "temperature": 30,
+      "last_maintenance": "2024-11-10",
+      "next_maintenance": "2025-03-17",
+      "operator": "Unassigned"
+    }
+  ]
+}

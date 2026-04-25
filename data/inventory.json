@@ -1,0 +1,49 @@
+{
+  "inventory": [
+    {
+      "id": "INV001",
+      "item": "Steel Rods",
+      "quantity": 320,
+      "unit": "pieces",
+      "min_threshold": 100,
+      "supplier": "MetalCo Ltd",
+      "last_restocked": "2025-02-28"
+    },
+    {
+      "id": "INV002",
+      "item": "Hydraulic Oil",
+      "quantity": 45,
+      "unit": "liters",
+      "min_threshold": 50,
+      "supplier": "LubriTech",
+      "last_restocked": "2025-01-20"
+    },
+    {
+      "id": "INV003",
+      "item": "Welding Wire",
+      "quantity": 12,
+      "unit": "spools",
+      "min_threshold": 20,
+      "supplier": "WeldPro India",
+      "last_restocked": "2025-02-01"
+    },
+    {
+      "id": "INV004",
+      "item": "Safety Gloves",
+      "quantity": 200,
+      "unit": "pairs",
+      "min_threshold": 50,
+      "supplier": "SafeGear Co",
+      "last_restocked": "2025-03-01"
+    },
+    {
+      "id": "INV005",
+      "item": "Drill Bits",
+      "quantity": 80,
+      "unit": "pieces",
+      "min_threshold": 30,
+      "supplier": "ToolMart",
+      "last_restocked": "2025-02-15"
+    }
+  ]
+}

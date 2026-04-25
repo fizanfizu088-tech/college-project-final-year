@@ -1,0 +1,61 @@
+2026-03-17 19:49:49 | INFO | Chatbot session started.
+2026-03-17 19:50:15 | INFO | [MATCHED] Input: 'hello' | Response: 'Hello! I am the NLI Manufacturing Assistant. How can I help ...' | Time: 0.01ms
+2026-03-17 19:50:20 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.01ms
+2026-03-17 19:50:27 | INFO | [MATCHED] Input: 'machine health' | Response: 'Hello! I am the NLI Manufacturing Assistant. How can I help ...' | Time: 0.04ms
+2026-03-17 19:50:31 | INFO | [MATCHED] Input: 'inventory' | Response: 'Inventory report shown for 5 items....' | Time: 0.02ms
+2026-03-17 19:50:36 | INFO | [MATCHED] Input: 'low stock' | Response: 'Inventory report shown for 5 items....' | Time: 0.01ms
+2026-03-17 19:50:40 | INFO | [MATCHED] Input: 'warnings' | Response: '1 machine(s) in WARNING state....' | Time: 0.02ms
+2026-03-17 19:50:44 | INFO | [MATCHED] Input: 'offline' | Response: '1 machine(s) offline....' | Time: 0.02ms
+2026-03-17 19:50:49 | INFO | [MATCHED] Input: 'maintenance' | Response: 'Maintenance schedule shown for 5 machines....' | Time: 0.02ms
+2026-03-17 19:50:54 | INFO | [MATCHED] Input: 'production' | Response: 'Production summary: 2 machines active, ~360 units estimated....' | Time: 0.02ms
+2026-03-17 19:50:56 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.02ms
+2026-03-17 19:50:59 | INFO | Chatbot session ended by user.
+2026-03-17 19:53:07 | INFO | Chatbot session started.
+2026-03-17 19:53:18 | INFO | [MATCHED] Input: 'machine health' | Response: 'Health report shown for 5 machines....' | Time: 0.03ms
+2026-03-17 19:53:21 | INFO | [MATCHED] Input: 'low stock' | Response: '2 item(s) below minimum stock threshold....' | Time: 0.04ms
+2026-03-17 19:53:23 | INFO | [MATCHED] Input: 'hi' | Response: 'Hello! I am the NLI Manufacturing Assistant. How can I help ...' | Time: 0.14ms
+2026-03-18 22:18:40 | INFO | Chatbot session started.
+2026-04-13 09:57:05 | INFO | Chatbot session started.
+2026-04-13 09:57:38 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.02ms
+2026-04-13 09:57:52 | INFO | [MATCHED] Input: 'machine health' | Response: 'Health report shown for 5 machines....' | Time: 0.05ms
+2026-04-13 09:58:45 | INFO | [MATCHED] Input: 'inventory' | Response: 'Inventory report shown for 5 items....' | Time: 0.10ms
+2026-04-14 18:26:11 | INFO | Chatbot session started.
+2026-04-14 18:26:47 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.42ms
+2026-04-14 18:28:34 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.02ms
+2026-04-14 18:29:28 | INFO | [UNMATCHED] Input: 'health' | Response: 'I didn't understand that. Try: 'show status', 'inventory', '...' | Time: 0.12ms
+2026-04-14 18:29:33 | INFO | [MATCHED] Input: 'machine health' | Response: 'Health report shown for 5 machines....' | Time: 0.02ms
+2026-04-14 18:40:31 | INFO | Chatbot session started.
+2026-04-14 18:40:38 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.09ms
+2026-04-14 18:40:43 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.02ms
+2026-04-14 18:40:49 | INFO | [MATCHED] Input: 'machine health' | Response: 'Health report shown for 5 machines....' | Time: 0.03ms
+2026-04-14 18:40:53 | INFO | [MATCHED] Input: 'inventory' | Response: 'Inventory report shown for 5 items....' | Time: 0.18ms
+2026-04-14 18:40:56 | INFO | [MATCHED] Input: 'low stock' | Response: '2 item(s) below minimum stock threshold....' | Time: 0.03ms
+2026-04-14 18:41:05 | INFO | [MATCHED] Input: 'maintenance' | Response: 'Maintenance schedule shown for 5 machines....' | Time: 0.18ms
+2026-04-14 18:41:14 | INFO | [MATCHED] Input: 'warnings' | Response: '1 machine(s) in WARNING state....' | Time: 0.08ms
+2026-04-14 18:41:22 | INFO | [MATCHED] Input: 'offline' | Response: '1 machine(s) offline....' | Time: 0.09ms
+2026-04-14 18:41:25 | INFO | [MATCHED] Input: 'production' | Response: 'Production summary: 2 machines active, ~360 units estimated....' | Time: 0.08ms
+2026-04-14 18:41:32 | INFO | Chatbot session ended by user.
+2026-04-14 18:45:50 | INFO | Chatbot session started.
+2026-04-14 18:45:52 | INFO | [MATCHED] Input: 'offline' | Response: '1 machine(s) offline....' | Time: 0.08ms
+2026-04-14 18:51:27 | INFO | Chatbot session started.
+2026-04-14 18:51:42 | INFO | [MATCHED] Input: 'production' | Response: 'Production summary: 2 machines active, ~360 units estimated....' | Time: 0.14ms
+2026-04-14 18:53:11 | INFO | Chatbot session started.
+2026-04-14 18:53:25 | INFO | Chatbot session started.
+2026-04-14 18:53:29 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.02ms
+2026-04-14 18:54:05 | INFO | [MATCHED] Input: 'production' | Response: 'Production summary: 2 machines active, ~360 units estimated....' | Time: 0.14ms
+2026-04-14 19:16:30 | INFO | [UNMATCHED] Input: 'python main.py' | Response: 'I didn't understand that. Try: 'show status', 'inventory', '...' | Time: 0.36ms
+2026-04-14 19:16:47 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.02ms
+2026-04-14 19:16:56 | INFO | Chatbot session ended by user.
+2026-04-20 22:18:25 | INFO | Chatbot session started.
+2026-04-20 22:18:30 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.12ms
+2026-04-20 22:18:43 | INFO | [MATCHED] Input: 'production' | Response: 'Production summary: 2 machines active, ~360 units estimated....' | Time: 0.07ms
+2026-04-20 22:18:56 | INFO | Chatbot session ended by user.
+2026-04-24 19:35:23 | INFO | Chatbot session started.
+2026-04-24 19:35:42 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.10ms
+2026-04-24 19:36:02 | INFO | [MATCHED] Input: 'show status' | Response: 'Status report shown for 5 machines....' | Time: 0.03ms
+2026-04-24 19:37:07 | INFO | [MATCHED] Input: 'low stock' | Response: '2 item(s) below minimum stock threshold....' | Time: 0.09ms
+2026-04-24 19:37:28 | INFO | [MATCHED] Input: 'machine health' | Response: 'Health report shown for 5 machines....' | Time: 0.04ms
+2026-04-25 12:26:48 | INFO | Chatbot session ended by user.
+2026-04-25 12:54:25 | INFO | Chatbot session started.
+2026-04-25 12:54:29 | INFO | [MATCHED] Input: 'help' | Response: 'Help menu displayed....' | Time: 0.10ms
+2026-04-25 12:55:01 | INFO | Chatbot session ended by user.
