@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manufacturing NL Interface — BCA AI Project</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #080b10;
+      --panel:     #0d1117;
+      --card:      #111822;
+      --border:    #1e2d40;
+      --amber:     #f0a500;
+      --amber2:    #ffcc44;
+      --amber-dim: #7a5200;
+      --amber-glow:#f0a50030;
+      --green:     #00e676;
+      --green-dim: #00e67622;
+      --red:       #ff3d57;
+      --red-dim:   #ff3d5722;
+      --cyan:      #00e5ff;
+      --cyan-dim:  #00e5ff22;
+      --yellow:    #ffd600;
+      --t1:        #eaf0ff;
+      --t2:        #7a8fa8;
+      --t3:        #3a4a5e;
+      --mono:      'Share Tech Mono', monospace;
+      --display:   'Rajdhani', sans-serif;
+      --body:      'Exo 2', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--t1); font-family: var(--body); }
+
+    /* ── SCANLINE + GRID TEXTURE ─────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.012) 2px, rgba(0,229,255,0.012) 4px),
+        radial-gradient(ellipse at 20% 50%, #0a1628 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, #0f1a10 0%, transparent 50%);
+    }
+
+    /* ── CORNER DECORATION ───────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed; top: 0; right: 0;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle at top right, rgba(240,165,0,0.07), transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .app {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-rows: 64px 1fr;
+      grid-template-columns: 280px 1fr 260px;
+      height: 100vh;
+    }
+
+    /* ════════════════════════════════════════════
+       TOP BAR
+    ════════════════════════════════════════════ */
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex; align-items: center; gap: 0;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+
+    /* animated amber line across bottom of topbar */
+    .topbar::after {
+      content: '';
+      position: absolute; bottom: 0; left: -100%; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--amber), var(--cyan), transparent);
+      animation: scanline 4s linear infinite;
+    }
+    @keyframes scanline { to { left: 100%; } }
+
+    .tb-brand {
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 22px;
+      border-right: 1px solid var(--border);
+      height: 100%;
+    }
+
+    .tb-icon-wrap {
+      position: relative; width: 36px; height: 36px;
+    }
+
+    .tb-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--amber), #ff6b00);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px var(--amber-glow);
+    }
+
+    .tb-title {
+      font-family: var(--display);
+      font-size: 20px; font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, var(--t1), var(--amber2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .tb-sub {
+      font-family: var(--mono);
+      font-size: 9px; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 2px;
+    }
+
+    /* ── STAT PILLS ─────────────────────────────────── */
+    .tb-stats {
+      display: flex; align-items: center; gap: 0;
+      flex: 1; padding: 0 10px;
+    }
+
+    .tb-stat {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 20px; height: 100%;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+
+    .tb-stat-icon { font-size: 18px; }
+
+    .tb-stat-val {
+      font-family: var(--mono);
+      font-size: 22px; font-weight: 700; line-height: 1;
+      transition: all 0.4s;
+    }
+
+    .tb-stat-label {
+      font-size: 10px; color: var(--t2);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .stat-green { color: var(--green); text-shadow: 0 0 12px var(--green); }
+    .stat-red   { color: var(--red);   text-shadow: 0 0 12px var(--red); }
+    .stat-amber { color: var(--amber); text-shadow: 0 0 12px var(--amber); }
+    .stat-cyan  { color: var(--cyan);  text-shadow: 0 0 12px var(--cyan); }
+
+    .tb-right {
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 20px; margin-left: auto;
+    }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 7px;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--green); letter-spacing: 2px;
+      padding: 5px 12px;
+      border: 1px solid var(--green);
+      border-radius: 3px;
+      background: var(--green-dim);
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      background: var(--green); border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .time-display {
+      font-family: var(--mono); font-size: 13px;
+      color: var(--t2); letter-spacing: 2px;
+    }
+
+    /* ════════════════════════════════════════════
+       LEFT SIDEBAR
+    ════════════════════════════════════════════ */
+    .sidebar-left {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sidebar-left::-webkit-scrollbar { width: 3px; }
+    .sidebar-left::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .sec-head {
+      font-family: var(--mono);
+      font-size: 10px; color: var(--amber);
+      text-transform: uppercase; letter-spacing: 3px;
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-head::before {
+      content: ''; width: 3px; height: 12px;
+      background: var(--amber);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--amber);
+    }
+
+    /* ── MACHINE CARD ──────────────────────────────── */
+    .mc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 11px 13px;
+      cursor: pointer;
+      position: relative; overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .mc:hover {
+      border-color: var(--amber-dim);
+      transform: translateX(3px);
+      box-shadow: -3px 0 0 var(--amber), 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    /* colored left accent */
+    .mc::before {
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 3px;
+    }
+    .mc.run::before  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .mc.warn::before { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+    .mc.off::before  { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .mc.idle::before { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+    /* background glow on status */
+    .mc.run  { background: linear-gradient(135deg, var(--card), #0d1a12); }
+    .mc.warn { background: linear-gradient(135deg, var(--card), #1a1500); }
+    .mc.off  { background: linear-gradient(135deg, var(--card), #1a0a0a); }
+
+    .mc-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .mc-id  { font-family: var(--mono); font-size: 12px; color: var(--amber); }
+    .mc-name{ font-size: 11px; color: var(--t2); }
+
+    .pill {
+      font-family: var(--mono); font-size: 9px;
+      padding: 2px 7px; border-radius: 2px;
+      text-transform: uppercase; letter-spacing: 1px;
+      font-weight: 700;
+    }
+    .pill-run  { background: var(--green-dim);  color: var(--green);  border: 1px solid #00e67644; }
+    .pill-warn { background: #ffd60022;          color: var(--yellow); border: 1px solid #ffd60044; }
+    .pill-off  { background: var(--red-dim);    color: var(--red);    border: 1px solid #ff3d5744; }
+    .pill-idle { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid #00e5ff44; }
+
+    .hbar { display: flex; align-items: center; gap: 7px; }
+    .hbar-bg { flex: 1; height: 3px; background: #1a2535; border-radius: 2px; overflow: hidden; }
+    .hbar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+    .hbar-pct { font-family: var(--mono); font-size: 10px; color: var(--t3); }
+
+    /* ── ALERT STRIP ───────────────────────────────── */
+    .alert-strip {
+      border-radius: 5px; padding: 8px 10px;
+      background: var(--card); border: 1px solid;
+      position: relative; overflow: hidden;
+    }
+    .alert-strip.crit { border-color: #ff3d5744; }
+    .alert-strip.warn { border-color: #ffd60044; }
+    .alert-strip.info { border-color: #00e5ff44; }
+
+    .alert-strip::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    }
+    .alert-strip.crit::before { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .alert-strip.warn::before { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .alert-strip.info::before { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+    .alert-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .alert-sev { font-family: var(--mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .crit .alert-sev { color: var(--red); }
+    .warn .alert-sev { color: var(--yellow); }
+    .info .alert-sev { color: var(--cyan); }
+    .alert-id   { font-family: var(--mono); font-size: 9px; color: var(--t3); margin-left: auto; }
+    .alert-msg  { font-size: 11px; color: var(--t2); line-height: 1.4; }
+
+    /* ════════════════════════════════════════════
+       MAIN CHAT AREA
+    ════════════════════════════════════════════ */
+    .chat-main {
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .msgs {
+      flex: 1; overflow-y: auto;
+      padding: 24px 28px;
+      display: flex; flex-direction: column; gap: 18px;
+      scroll-behavior: smooth;
+    }
+    .msgs::-webkit-scrollbar { width: 4px; }
+    .msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── WELCOME SCREEN ─────────────────────────────── */
+    .welcome {
+      margin: auto; text-align: center; max-width: 500px;
+      animation: fadeUp 0.7s ease;
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .welcome-glyph {
+      width: 80px; height: 80px; margin: 0 auto 20px;
+      border: 2px solid var(--amber);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 0 30px var(--amber-glow), inset 0 0 20px var(--amber-glow);
+      animation: spin-glow 4s ease-in-out infinite;
+    }
+    @keyframes spin-glow {
+      0%,100% { box-shadow: 0 0 30px var(--amber-glow), inset 0 0 20px var(--amber-glow); }
+      50%      { box-shadow: 0 0 50px #f0a50060, inset 0 0 30px #f0a50040; }
+    }
+
+    .welcome-title {
+      font-family: var(--display);
+      font-size: 32px; font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--t1) 0%, var(--amber2) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .welcome-sub {
+      font-size: 14px; color: var(--t2); line-height: 1.7; margin-bottom: 28px;
+    }
+
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+    .chip {
+      font-family: var(--mono); font-size: 12px;
+      padding: 7px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--amber); cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+    .chip:hover {
+      border-color: var(--amber);
+      background: var(--amber-glow);
+      box-shadow: 0 0 12px var(--amber-glow);
+      transform: translateY(-2px);
+    }
+
+    /* ── MESSAGE BUBBLES ─────────────────────────────── */
+    .msg-row {
+      display: flex; flex-direction: column; gap: 5px;
+      animation: fadeUp 0.3s ease;
+    }
+    .msg-row.user { align-items: flex-end; }
+    .msg-row.bot  { align-items: flex-start; }
+
+    .msg-meta {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 10px; color: var(--t3);
+      padding: 0 4px;
+    }
+
+    .intent-chip {
+      font-family: var(--mono); font-size: 10px;
+      padding: 2px 8px; border-radius: 2px;
+      background: var(--amber-glow);
+      border: 1px solid var(--amber-dim);
+      color: var(--amber); letter-spacing: 1px;
+    }
+
+    .conf-chip {
+      padding: 1px 6px; border-radius: 2px;
+      background: var(--green-dim);
+      border: 1px solid #00e67633;
+      color: var(--green); font-size: 10px;
+    }
+
+    .bubble {
+      max-width: 88%;
+      border-radius: 6px;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    /* USER bubble */
+    .msg-row.user .bubble {
+      background: linear-gradient(135deg, var(--amber), #e08000);
+      color: #0a0600;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 11px 16px;
+      border-radius: 8px 8px 2px 8px;
+      box-shadow: 0 4px 20px var(--amber-glow);
+    }
+
+    /* BOT bubble */
+    .msg-row.bot .bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 2px 8px 8px 8px;
+      font-size: 13.5px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* ── RESPONSE CARD ───────────────────────────────── */
+    .resp-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 15px;
+      background: #0a0f18;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .resp-title {
+      font-family: var(--display);
+      font-size: 15px; font-weight: 600;
+      letter-spacing: 0.5px; color: var(--t1);
+    }
+
+    .resp-body { padding: 13px 15px; }
+
+    /* ── STAT GRID ───────────────────────────────────── */
+    .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      background: #080c12;
+      border: 1px solid var(--border);
+      border-radius: 5px; padding: 10px 12px;
+      position: relative; overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0; height: 2px;
+    }
+    .stat-card.green::after { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .stat-card.red::after   { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+    .stat-card.amber::after { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+    .stat-card.cyan::after  { background: var(--cyan);  box-shadow: 0 0 8px var(--cyan); }
+
+    .stat-num { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
+    .stat-lbl { font-size: 11px; color: var(--t2); margin-top: 4px; }
+
+    /* ── PROGRESS BAR ────────────────────────────────── */
+    .prog-wrap { margin: 10px 0; }
+    .prog-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--t2); margin-bottom: 5px; }
+    .prog-bg { height: 8px; background: #080c12; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+    .prog-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--amber-dim), var(--amber), var(--amber2)); box-shadow: 0 0 10px var(--amber-glow); transition: width 1s ease; position: relative; overflow: hidden; }
+    .prog-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%); animation: shimmer 2s infinite; }
+    @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+    /* ── DATA TABLE ──────────────────────────────────── */
+    .dt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .dt th { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--t3); text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+    .dt td { padding: 8px 10px; border-bottom: 1px solid #0e1520; color: var(--t2); vertical-align: middle; }
+    .dt tr:last-child td { border-bottom: none; }
+    .dt tr:hover td { background: #ffffff06; }
+    .dt td:first-child { font-family: var(--mono); color: var(--amber); font-size: 12px; }
+
+    /* ── STATUS BADGES ───────────────────────────────── */
+    .badge {
+      font-family: var(--mono); font-size: 9px;
+      padding: 2px 8px; border-radius: 2px;
+      text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+    }
+    .badge-RUNNING  { background: var(--green-dim);  color: var(--green);  border: 1px solid #00e67633; }
+    .badge-OFFLINE  { background: var(--red-dim);    color: var(--red);    border: 1px solid #ff3d5733; }
+    .badge-WARNING  { background: #ffd60020;         color: var(--yellow); border: 1px solid #ffd60033; }
+    .badge-IDLE     { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid #00e5ff33; }
+    .badge-OK       { background: var(--green-dim);  color: var(--green);  border: 1px solid #00e67633; }
+    .badge-LOW      { background: #ffd60020;         color: var(--yellow); border: 1px solid #ffd60033; }
+    .badge-CRITICAL { background: var(--red-dim);    color: var(--red);    border: 1px solid #ff3d5733; }
+    .badge-HIGH     { background: #ffd60020;         color: var(--yellow); border: 1px solid #ffd60033; }
+    .badge-NORMAL   { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid #00e5ff33; }
+    .badge-OVERDUE  { background: var(--red-dim);    color: var(--red);    border: 1px solid #ff3d5733; animation: blink 1s infinite; }
+    .badge-INFO     { background: var(--cyan-dim);   color: var(--cyan);   border: 1px solid #00e5ff33; }
+
+    /* ── HELP GRID ───────────────────────────────────── */
+    .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .help-group { }
+    .help-group-title { font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .help-cmd { display: inline-block; font-family: var(--mono); font-size: 11px; color: var(--t2); background: #080c12; border: 1px solid var(--border); border-radius: 3px; padding: 2px 7px; margin: 2px 2px 2px 0; cursor: pointer; transition: all 0.15s; }
+    .help-cmd:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-glow); }
+
+    /* ── KV ROWS ─────────────────────────────────────── */
+    .kv { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid #0e1520; font-size: 13px; }
+    .kv:last-child { border-bottom: none; }
+    .kk { width: 140px; flex-shrink: 0; font-family: var(--mono); font-size: 11px; color: var(--t3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kv-val { color: var(--t1); }
+
+    /* ── TYPING ──────────────────────────────────────── */
+    .typing { display: flex; align-items: center; gap: 5px; padding: 12px 15px; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); animation: dotbounce 1.2s ease-in-out infinite; box-shadow: 0 0 8px var(--amber); }
+    .dot:nth-child(2) { animation-delay: .2s; }
+    .dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes dotbounce { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-7px);opacity:1} }
+
+    /* ── INLINE HEALTH BAR (table) ───────────────────── */
+    .inline-hbar { display: flex; align-items: center; gap: 7px; }
+    .inline-bg { width: 70px; height: 4px; background: #0a0f18; border-radius: 2px; overflow: hidden; }
+    .inline-fill { height: 100%; border-radius: 2px; }
+
+    /* ════════════════════════════════════════════
+       INPUT BAR
+    ════════════════════════════════════════════ */
+    .input-bar {
+      padding: 14px 22px;
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: flex-end;
+    }
+
+    .input-wrap { flex: 1; position: relative; }
+
+    textarea.ci {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--t1);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 11px 15px;
+      outline: none; resize: none;
+      min-height: 42px; max-height: 100px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    textarea.ci:focus {
+      border-color: var(--amber-dim);
+      box-shadow: 0 0 0 2px var(--amber-glow), 0 0 20px var(--amber-glow);
+    }
+
+    textarea.ci::placeholder { color: var(--t3); }
+
+    .send-btn {
+      width: 44px; height: 42px;
+      background: linear-gradient(135deg, var(--amber), #e08000);
+      border: none; border-radius: 5px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+      box-shadow: 0 0 15px var(--amber-glow);
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px #f0a50060; }
+    .send-btn:active { transform: scale(0.95); }
+    .send-btn svg { width: 18px; height: 18px; fill: #0a0600; }
+
+    /* ════════════════════════════════════════════
+       RIGHT SIDEBAR — Performance
+    ════════════════════════════════════════════ */
+    .sidebar-right {
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .sidebar-right::-webkit-scrollbar { width: 3px; }
+    .sidebar-right::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 13px;
+      position: relative; overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      opacity: 0.4;
+    }
+
+    .m-label { font-family: var(--mono); font-size: 10px; color: var(--t3); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .m-val { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--amber); text-shadow: 0 0 15px var(--amber-glow); }
+    .m-sub { font-size: 11px; color: var(--t2); margin-top: 3px; }
+
+    /* Accuracy ring */
+    .ring-container { display: flex; align-items: center; gap: 14px; }
+    .ring-svg { flex-shrink: 0; filter: drop-shadow(0 0 8px var(--amber)); }
+
+    /* Quick cmd sidebar chips */
+    .side-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .side-chip {
+      font-family: var(--mono); font-size: 11px;
+      padding: 4px 10px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 3px; color: var(--amber); cursor: pointer;
+      transition: all 0.15s; letter-spacing: 0.5px;
+    }
+    .side-chip:hover { border-color: var(--amber); background: var(--amber-glow); }
+
+    /* ── DIVIDER ─────────────────────────────────────── */
+    .divider { height: 1px; background: var(--border); margin: 2px 0; }
+
+    /* ── UNKNOWN ─────────────────────────────────────── */
+    .unknown-box { padding: 13px 15px; }
+    .unk-input { font-family: var(--mono); font-size: 12px; color: var(--yellow); margin-bottom: 10px; }
+    .sugg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* ── EXTRA INFO ROW ──────────────────────────────── */
+    .meta-row { font-family: var(--mono); font-size: 10px; color: var(--t3); padding: 7px 13px; border-top: 1px solid #0e1520; background: #080c12; display: flex; gap: 14px; }
+    .meta-row span { display: flex; align-items: center; gap: 4px; }
+    .meta-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+    @media (max-width: 1100px) { .app { grid-template-columns: 260px 1fr; } .sidebar-right { display: none; } }
+    @media (max-width: 720px)  { .app { grid-template-columns: 1fr; }       .sidebar-left  { display: none; } }
+  </style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════════════════════════════════════════
+     TOP BAR
+══════════════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="tb-brand">
+    <div class="tb-icon">🏭</div>
+    <div>
+      <div class="tb-title">MFGNI &nbsp;// &nbsp;NL Interface</div>
+      <div class="tb-sub">BCA Artificial Intelligence · Final Year Project</div>
+    </div>
+  </div>
+
+  <div class="tb-stats">
+    <div class="tb-stat">
+      <div class="tb-stat-icon">⚙️</div>
+      <div>
+        <div class="tb-stat-val stat-green" id="tb-run">—</div>
+        <div class="tb-stat-label">Running</div>
+      </div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-icon">🔴</div>
+      <div>
+        <div class="tb-stat-val stat-red" id="tb-off">—</div>
+        <div class="tb-stat-label">Offline</div>
+      </div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-icon">📊</div>
+      <div>
+        <div class="tb-stat-val stat-amber" id="tb-eff">—</div>
+        <div class="tb-stat-label">Efficiency</div>
+      </div>
+    </div>
+    <div class="tb-stat">
+      <div class="tb-stat-icon">🚨</div>
+      <div>
+        <div class="tb-stat-val stat-red" id="tb-alr">—</div>
+        <div class="tb-stat-label">Alerts</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tb-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="time-display" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════
+     LEFT SIDEBAR
+══════════════════════════════════════════════════ -->
+<aside class="sidebar-left">
+  <div class="sec-head">Machine Status</div>
+  <div id="machine-list">
+    <!-- Populated by JS -->
+    <div style="font-family:var(--mono);font-size:11px;color:var(--t3);text-align:center;padding:20px 0">Loading...</div>
+  </div>
+  <div class="divider"></div>
+  <div class="sec-head">Active Alerts</div>
+  <div id="alert-list"></div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════
+     CHAT
+══════════════════════════════════════════════════ -->
+<main class="chat-main">
+  <div class="msgs" id="msgs">
+    <div class="welcome" id="welcome">
+      <div class="welcome-glyph">🤖</div>
+      <div class="welcome-title">MANUFACTURING ASSISTANT</div>
+      <div class="welcome-sub">
+        Ask me anything about the plant in plain English.<br>
+        Machines · Inventory · Production · Alerts · Maintenance
+      </div>
+      <div class="chip-grid">
+        <span class="chip" onclick="qs(this)">show status</span>
+        <span class="chip" onclick="qs(this)">machine health</span>
+        <span class="chip" onclick="qs(this)">inventory</span>
+        <span class="chip" onclick="qs(this)">alerts</span>
+        <span class="chip" onclick="qs(this)">production</span>
+        <span class="chip" onclick="qs(this)">maintenance</span>
+        <span class="chip" onclick="qs(this)">warnings</span>
+        <span class="chip" onclick="qs(this)">help</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea class="ci" id="ci" placeholder="Type a command or question in plain English..." rows="1"></textarea>
+    </div>
+    <button class="send-btn" onclick="send()" title="Send">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</main>
+
+<!-- ══════════════════════════════════════════════════
+     RIGHT SIDEBAR — Performance Metrics
+══════════════════════════════════════════════════ -->
+<aside class="sidebar-right">
+  <div class="sec-head">NLP Performance</div>
+
+  <div class="metric-card">
+    <div class="m-label">Intent Accuracy</div>
+    <div class="ring-container">
+      <svg class="ring-svg" width="56" height="56" viewBox="0 0 56 56">
+        <circle cx="28" cy="28" r="22" fill="none" stroke="#1a2535" stroke-width="5"/>
+        <circle cx="28" cy="28" r="22" fill="none" stroke="#f0a500" stroke-width="5"
+          stroke-dasharray="138.2" stroke-dashoffset="138.2"
+          stroke-linecap="round" transform="rotate(-90 28 28)" id="acc-ring"
+          style="transition: stroke-dashoffset 0.8s ease"/>
+      </svg>
+      <div>
+        <div class="m-val" id="m-acc">—%</div>
+        <div class="m-sub">matched queries</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="m-label">Session Queries</div>
+    <div class="m-val" id="m-q">0</div>
+    <div class="m-sub">total this session</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="m-label">Avg Response Time</div>
+    <div class="m-val" id="m-rt">—</div>
+    <div class="m-sub">milliseconds per query</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="m-label">Last Detected Intent</div>
+    <div style="font-family:var(--mono);font-size:13px;color:var(--amber);margin:6px 0 2px;letter-spacing:1px" id="m-int">—</div>
+    <div class="m-sub" id="m-conf">confidence: —</div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="sec-head">Quick Commands</div>
+  <div class="side-chips">
+    <span class="side-chip" onclick="qst('show status')">status</span>
+    <span class="side-chip" onclick="qst('machine health')">health</span>
+    <span class="side-chip" onclick="qst('warnings')">warnings</span>
+    <span class="side-chip" onclick="qst('offline')">offline</span>
+    <span class="side-chip" onclick="qst('inventory')">inventory</span>
+    <span class="side-chip" onclick="qst('low stock')">low stock</span>
+    <span class="side-chip" onclick="qst('alerts')">alerts</span>
+    <span class="side-chip" onclick="qst('production')">production</span>
+    <span class="side-chip" onclick="qst('maintenance')">maintenance</span>
+  </div>
+</aside>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+  const msgsEl = document.getElementById('msgs');
+  const inEl   = document.getElementById('ci');
+  let rtList   = [];
+
+  // ── Clock ──────────────────────────────────────────
+  setInterval(() => {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('en-GB');
+  }, 1000);
+
+  // ── Input ──────────────────────────────────────────
+  inEl.addEventListener('input', () => {
+    inEl.style.height = 'auto';
+    inEl.style.height = Math.min(inEl.scrollHeight, 100) + 'px';
+  });
+  inEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+
+  function qs(el)    { inEl.value = el.textContent.trim(); send(); }
+  function qst(text) { inEl.value = text; send(); }
+
+  // ── SEND ───────────────────────────────────────────
+  async function send() {
+    const text = inEl.value.trim();
+    if (!text) return;
+    document.getElementById('welcome')?.remove();
+    addUser(text);
+    inEl.value = ''; inEl.style.height = 'auto';
+    const tid = addTyping();
+    try {
+      const d = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      }).then(r => r.json());
+      document.getElementById(tid)?.remove();
+      addBot(d);
+      updateMetrics(d);
+    } catch {
+      document.getElementById(tid)?.remove();
+      addErrMsg();
+    }
+  }
+
+  function addUser(text) {
+    const t = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const row = el('div','msg-row user');
+    row.innerHTML = `<div class="msg-meta">${t}</div><div class="bubble">${esc(text)}</div>`;
+    msgsEl.appendChild(row); scrollB();
+  }
+
+  function addTyping() {
+    const id = 'ty'+Date.now(), row = el('div','msg-row bot'); row.id = id;
+    row.innerHTML = `<div class="bubble"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+    msgsEl.appendChild(row); scrollB(); return id;
+  }
+
+  function addBot(data) {
+    const t   = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const row = el('div','msg-row bot');
+    const conf = ((data.confidence||0)*100).toFixed(0);
+    const rt   = data.response_time_ms || 0;
+    row.innerHTML = `
+      <div class="msg-meta">
+        ${t} &nbsp;·&nbsp;
+        <span class="intent-chip">${data.intent}</span>
+        &nbsp;
+        <span class="conf-chip">✓ ${conf}%</span>
+        &nbsp;·&nbsp; ⏱ ${rt} ms
+      </div>
+      <div class="bubble">${renderResp(data.response, data)}</div>`;
+    msgsEl.appendChild(row); scrollB();
+  }
+
+  function addErrMsg() {
+    const row = el('div','msg-row bot');
+    row.innerHTML = `<div class="bubble"><div class="resp-body" style="color:var(--red)">⚠️ Cannot reach server. Make sure <code>python app.py</code> is running.</div></div>`;
+    msgsEl.appendChild(row); scrollB();
+  }
+
+  // ── RENDER RESPONSE ────────────────────────────────
+  function renderResp(r, data) {
+    if (!r) return '<div class="resp-body">No data.</div>';
+    switch (r.type) {
+      case 'status':        return rStatus(r);
+      case 'machine_health':return rMachineHealth(r);
+      case 'machine_detail':return rMachineDetail(r);
+      case 'inventory':
+      case 'low_stock':     return rInventory(r);
+      case 'production':    return rProduction(r);
+      case 'maintenance':   return rMaintenance(r);
+      case 'warnings':
+      case 'offline':       return rSimpleTable(r);
+      case 'alerts':        return rAlerts(r);
+      case 'help':          return rHelp(r);
+      case 'text':          return `<div class="resp-body">${r.data.message}</div>`;
+      case 'unknown':       return rUnknown(r);
+      default:              return `<div class="resp-body">${JSON.stringify(r.data)}</div>`;
+    }
+  }
+
+  function rStatus(r) {
+    const d = r.data, pct = d.progress_pct;
+    return `
+      <div class="resp-head"><span class="resp-title">🏭 ${r.title}</span></div>
+      <div class="resp-body">
+        <div class="stat-grid">
+          <div class="stat-card green"><div class="stat-num" style="color:var(--green)">${d.running}</div><div class="stat-lbl">Machines Running</div></div>
+          <div class="stat-card red">  <div class="stat-num" style="color:var(--red)">${d.offline}</div><div class="stat-lbl">Machines Offline</div></div>
+          <div class="stat-card amber"><div class="stat-num" style="color:var(--amber)">${d.efficiency}%</div><div class="stat-lbl">Efficiency</div></div>
+          <div class="stat-card cyan"> <div class="stat-num" style="color:var(--red)">${d.critical_alerts}</div><div class="stat-lbl">Critical Alerts</div></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-labels"><span>Production Progress</span><span>${d.produced} / ${d.target} units &nbsp;(${pct}%)</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--t2);font-family:var(--mono)">
+          SHIFT: ${d.shift} &nbsp;·&nbsp; SUPERVISOR: ${d.supervisor}
+        </div>
+      </div>
+      <div class="meta-row">
+        <span><div class="meta-dot" style="background:var(--green)"></div>System Online</span>
+        <span><div class="meta-dot" style="background:var(--amber)"></div>Data Live</span>
+      </div>`;
+  }
+
+  function rMachineHealth(r) {
+    const rows = r.data.map(m => {
+      const hc = m.health>=80?'var(--green)':m.health>=50?'var(--yellow)':'var(--red)';
+      return `<tr>
+        <td>${m.id}</td><td>${m.name}</td>
+        <td><div class="inline-hbar">
+          <div class="inline-bg"><div class="inline-fill" style="width:${m.health}%;background:${hc}"></div></div>
+          <span style="font-family:var(--mono);font-size:11px;color:${hc}">${m.health}%</span>
+        </div></td>
+        <td><span class="badge badge-${m.status}">${m.status}</span></td>
+      </tr>`;
+    }).join('');
+    return `<div class="resp-head"><span class="resp-title">💪 ${r.title}</span></div>
+      <table class="dt"><thead><tr><th>ID</th><th>Machine</th><th>Health</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function rMachineDetail(r) {
+    const m = r.data, hc = m.health>=80?'var(--green)':m.health>=50?'var(--yellow)':'var(--red)';
+    return `<div class="resp-head"><span class="resp-title">🔩 ${r.title}</span></div>
+      <div class="resp-body">
+        <div class="kv"><div class="kk">Status</div><div class="kv-val"><span class="badge badge-${m.status}">${m.status}</span></div></div>
+        <div class="kv"><div class="kk">Health</div><div class="kv-val">
+          <div class="inline-hbar"><div class="inline-bg" style="width:120px"><div class="inline-fill" style="width:${m.health}%;background:${hc}"></div></div>
+          <span style="color:${hc};font-family:var(--mono)">${m.health}%</span></div></div></div>
+        <div class="kv"><div class="kk">Temperature</div><div class="kv-val">${m.temp}°C</div></div>
+        <div class="kv"><div class="kk">Location</div><div class="kv-val">${m.location}</div></div>
+      </div>`;
+  }
+
+  function rInventory(r) {
+    if (!r.data.length) return `<div class="resp-head"><span class="resp-title">📦 ${r.title}</span></div><div class="resp-body" style="color:var(--green)">✅ All stock levels adequate.</div>`;
+    const rows = r.data.map(i => `<tr>
+      <td>${i.id}</td><td>${i.item}</td>
+      <td style="font-family:var(--mono)">${i.qty} ${i.unit}</td>
+      <td><span class="badge badge-${i.status}">${i.status}</span></td>
+    </tr>`).join('');
+    return `<div class="resp-head"><span class="resp-title">📦 ${r.title}</span></div>
+      <table class="dt"><thead><tr><th>ID</th><th>Item</th><th>Quantity</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function rProduction(r) {
+    const d = r.data;
+    const ec = d.efficiency>=80?'var(--green)':d.efficiency>=60?'var(--yellow)':'var(--red)';
+    return `<div class="resp-head"><span class="resp-title">⚙️ ${r.title}</span></div>
+      <div class="resp-body">
+        <div class="stat-grid">
+          <div class="stat-card amber"><div class="stat-num" style="color:var(--amber)">${d.produced}</div><div class="stat-lbl">Units Produced</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--t2)">${d.target}</div><div class="stat-lbl">Target Units</div></div>
+          <div class="stat-card green"><div class="stat-num" style="color:${ec}">${d.efficiency}%</div><div class="stat-lbl">Efficiency</div></div>
+          <div class="stat-card red"><div class="stat-num" style="color:var(--yellow)">${d.defects}</div><div class="stat-lbl">Defective Units</div></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-labels"><span>Target Progress</span><span>${d.progress_pct}%</span></div>
+          <div class="prog-bg"><div class="prog-fill" style="width:${d.progress_pct}%"></div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--t2);font-family:var(--mono)">
+          SHIFT: ${d.shift} &nbsp;·&nbsp; DOWNTIME: ${d.downtime_min} MIN &nbsp;·&nbsp; DEFECT RATE: ${d.defect_rate}%
+        </div>
+      </div>`;
+  }
+
+  function rMaintenance(r) {
+    const rows = r.data.map(t => `<tr>
+      <td>${t.machine}</td><td style="font-size:12px">${t.task}</td>
+      <td><span class="badge badge-${t.priority}">${t.priority}</span></td>
+      <td style="font-family:var(--mono);font-size:11px;color:${t.due==='OVERDUE'?'var(--red)':'var(--t2)'}">${t.due}</td>
+    </tr>`).join('');
+    return `<div class="resp-head"><span class="resp-title">🛠️ ${r.title}</span></div>
+      <table class="dt"><thead><tr><th>Machine</th><th>Task</th><th>Priority</th><th>Due Date</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function rSimpleTable(r) {
+    if (!r.data.length) return `<div class="resp-head"><span class="resp-title">${r.title}</span></div><div class="resp-body" style="color:var(--green)">✅ No machines in this state.</div>`;
+    const rows = r.data.map(m => `<tr>
+      <td>${m.id}</td><td>${m.name}</td>
+      <td style="font-family:var(--mono)">${m.health}%</td>
+    </tr>`).join('');
+    return `<div class="resp-head"><span class="resp-title">${r.title}</span></div>
+      <table class="dt"><thead><tr><th>ID</th><th>Machine</th><th>Health</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function rAlerts(r) {
+    if (!r.data.length) return `<div class="resp-head"><span class="resp-title">🚨 ${r.title}</span></div><div class="resp-body" style="color:var(--green)">✅ No active alerts. All systems normal.</div>`;
+    const items = r.data.map(a => {
+      const sv = a.sev.toLowerCase(), icon = a.sev==='CRITICAL'?'🔴':a.sev==='WARNING'?'⚠️':'ℹ️';
+      return `<div class="alert-strip ${sv}" style="margin-bottom:8px">
+        <div class="alert-top"><span>${icon}</span><span class="alert-sev">${a.sev}</span><span class="alert-id">${a.machine} · ${a.id}</span></div>
+        <div class="alert-msg">${a.msg}</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:4px">${a.time}</div>
+      </div>`;
+    }).join('');
+    return `<div class="resp-head"><span class="resp-title">🚨 ${r.title}</span></div><div class="resp-body">${items}</div>`;
+  }
+
+  function rHelp(r) {
+    const groups = Object.entries(r.data).map(([g,cmds]) => `
+      <div class="help-group">
+        <div class="help-group-title">${g}</div>
+        <div>${cmds.map(c=>`<span class="help-cmd" onclick="qst('${c}')">${c}</span>`).join('')}</div>
+      </div>`).join('');
+    return `<div class="resp-head"><span class="resp-title">💬 ${r.title}</span></div>
+      <div class="resp-body"><div class="help-grid">${groups}</div></div>`;
+  }
+
+  function rUnknown(r) {
+    const chips = r.data.suggestions.map(s=>`<span class="chip" style="font-size:11px" onclick="qst('${s}')">${s}</span>`).join('');
+    return `<div class="resp-head"><span class="resp-title">❓ ${r.title}</span></div>
+      <div class="unknown-box">
+        <div class="unk-input">INPUT: "${esc(r.data.input)}"</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:9px">Command not recognised. Try:</div>
+        <div class="sugg-chips">${chips}</div>
+      </div>`;
+  }
+
+  // ── UPDATE METRICS ─────────────────────────────────
+  function updateMetrics(data) {
+    document.getElementById('m-int').textContent  = data.intent || '—';
+    document.getElementById('m-conf').textContent = `confidence: ${((data.confidence||0)*100).toFixed(0)}%`;
+    if (data.response_time_ms !== undefined) {
+      rtList.push(data.response_time_ms);
+      const avg = rtList.reduce((a,b)=>a+b,0) / rtList.length;
+      document.getElementById('m-rt').textContent = avg.toFixed(3) + ' ms';
+    }
+    fetch('/api/stats').then(r=>r.json()).then(s => {
+      document.getElementById('m-q').textContent   = s.total_queries;
+      document.getElementById('m-acc').textContent = s.accuracy + '%';
+      const ring = document.getElementById('acc-ring');
+      ring.style.strokeDashoffset = 138.2 - (s.accuracy/100)*138.2;
+    });
+  }
+
+  // ── INIT SIDEBAR ───────────────────────────────────
+  async function initSidebar() {
+    try {
+      // Stats
+      const s = await fetch('/api/stats').then(r=>r.json());
+      document.getElementById('tb-run').textContent = s.machines_running;
+      document.getElementById('tb-off').textContent = s.machines_offline;
+      document.getElementById('tb-eff').textContent = s.efficiency + '%';
+      document.getElementById('tb-alr').textContent = s.active_alerts;
+
+      // Machines
+      const md = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message:'machine health'}) }).then(r=>r.json());
+      if (md.response?.data) {
+        document.getElementById('machine-list').innerHTML = md.response.data.map(m => {
+          const cls = m.status==='RUNNING'?'run':m.status==='WARNING'?'warn':m.status==='OFFLINE'?'off':'idle';
+          const hc  = m.health>=80?'var(--green)':m.health>=50?'var(--yellow)':'var(--red)';
+          const pillClass = `pill-${cls}`;
+          return `<div class="mc ${cls}" onclick="qst('${m.id.toLowerCase()}')">
+            <div class="mc-row">
+              <div><div class="mc-id">${m.id}</div><div class="mc-name">${m.name}</div></div>
+              <span class="pill ${pillClass}">${m.status}</span>
+            </div>
+            <div class="hbar">
+              <div class="hbar-bg"><div class="hbar-fill" style="width:${m.health}%;background:${hc}"></div></div>
+              <span class="hbar-pct">${m.health}%</span>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      // Alerts
+      const ad = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message:'alerts'}) }).then(r=>r.json());
+      if (ad.response?.data) {
+        document.getElementById('alert-list').innerHTML = ad.response.data.map(a => {
+          const sv = a.sev.toLowerCase(), icon = a.sev==='CRITICAL'?'🔴':a.sev==='WARNING'?'⚠️':'ℹ️';
+          return `<div class="alert-strip ${sv}">
+            <div class="alert-top"><span>${icon}</span><span class="alert-sev">${a.sev}</span><span class="alert-id">${a.machine}</span></div>
+            <div class="alert-msg">${a.msg}</div>
+          </div>`;
+        }).join('');
+      }
+    } catch(e) {}
+  }
+
+  function scrollB() { msgsEl.scrollTop = msgsEl.scrollHeight; }
+  function el(tag, cls) { const d=document.createElement(tag); d.className=cls; return d; }
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  initSidebar();
+  inEl.focus();
+</script>
+</body>
+</html>
